@@ -1,54 +1,79 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback } from "react";
-import gsap from "gsap";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
-
-gsap.registerPlugin(ScrollToPlugin);
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
+import HoverTooltip from "./HoverTooltip";
+import type { Zone } from "./HumanoidScene";
 
 const HumanoidScene = dynamic(() => import("./HumanoidScene"), { ssr: false });
 
-export default function HeroSection() {
-  const scrollTo = useCallback((id: string) => {
-    gsap.to(window, { duration: 1.2, scrollTo: { y: `#${id}`, offsetY: 70 }, ease: "power2.inOut" });
-  }, []);
+const ZONE_ROUTES: Record<Zone, string> = {
+  head: "/about",
+  torso: "/resume",
+  arms: "/skills",
+  legs: "/projects",
+};
 
-  const handleHeadClick = useCallback(() => scrollTo("about"), [scrollTo]);
-  const handleTorsoClick = useCallback(() => scrollTo("work"), [scrollTo]);
+export default function HeroSection() {
+  const router = useRouter();
+  const [hoverZone, setHoverZone] = useState<Zone | null>(null);
+  const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
+
+  const handleZoneClick = useCallback(
+    (zone: Zone) => {
+      router.push(ZONE_ROUTES[zone]);
+    },
+    [router]
+  );
+
+  const handleHoverChange = useCallback(
+    (zone: Zone | null, m?: { x: number; y: number }) => {
+      setHoverZone(zone);
+      if (m) setMouse(m);
+      else setMouse(null);
+    },
+    []
+  );
 
   return (
     <section
-      id="hero"
-      style={{ backgroundColor: "#0a0f2c" }}
-      className="relative w-full h-screen flex items-center justify-center overflow-hidden"
+      className="relative w-full flex flex-col"
+      style={{ backgroundColor: "#f5f3ee", height: "calc(100vh - 64px)" }}
     >
-      {/* Three.js canvas fills entire section */}
-      <div className="absolute inset-0">
-        <HumanoidScene onHeadClick={handleHeadClick} onTorsoClick={handleTorsoClick} />
-      </div>
-
-      {/* Text overlay */}
-      <div className="relative z-10 text-center px-6 pointer-events-none select-none">
+      {/* Title row */}
+      <div className="text-center pt-6 pb-2 px-6 flex-shrink-0">
         <h1
-          className="text-6xl md:text-8xl font-bold tracking-tight"
-          style={{ fontFamily: "var(--font-heading)", color: "#ffffff" }}
+          className="text-5xl md:text-7xl font-bold leading-none tracking-tight"
+          style={{ fontFamily: "var(--font-heading)", color: "#0a0a0a" }}
         >
           Alexander Vogel
         </h1>
         <p
-          className="mt-4 text-lg md:text-xl tracking-widest uppercase"
-          style={{ fontFamily: "var(--font-body)", color: "#c9a84c" }}
+          className="mt-2 text-xs md:text-sm tracking-[0.3em] uppercase"
+          style={{ fontFamily: "var(--font-body)", color: "#b85c38" }}
         >
           Literature · Athletics · Entertainment
         </p>
+      </div>
+
+      {/* 3D canvas — flex-1 fills remaining height */}
+      <div className="flex-1 relative">
+        <HumanoidScene onZoneClick={handleZoneClick} onHoverChange={handleHoverChange} />
+      </div>
+
+      {/* Bottom hint */}
+      <div className="text-center pb-5 pt-2 flex-shrink-0">
         <p
-          className="mt-8 text-sm tracking-wide opacity-60"
-          style={{ color: "#ffffff", fontFamily: "var(--font-body)" }}
+          className="text-[10px] md:text-xs tracking-[0.4em] uppercase"
+          style={{ fontFamily: "var(--font-body)", color: "#6b6b6b" }}
         >
-          Click the figure to explore ↓
+          Hover the figure · Click to enter
         </p>
       </div>
+
+      {/* Tooltip overlay */}
+      <HoverTooltip zone={hoverZone} mouse={mouse} />
     </section>
   );
 }

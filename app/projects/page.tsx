@@ -20,18 +20,21 @@ const projects = [
 
 export default function ProjectsPage() {
   return (
-    <main className="min-h-[calc(100vh-64px)] px-6 py-12" style={{ backgroundColor: "#f5f3ee" }}>
+    <main
+      className="min-h-screen px-6 pt-28 pb-16"
+      style={{ backgroundColor: "#ffffff" }}
+    >
       <div className="max-w-6xl mx-auto">
         <p
           className="text-[10px] tracking-[0.4em] uppercase mb-2"
-          style={{ color: "#b85c38", fontFamily: "var(--font-body)" }}
+          style={{ color: "#666666", fontFamily: "var(--font-body)" }}
         >
           04 / Creative Work
         </p>
 
         <h1
           className="text-5xl md:text-7xl font-bold leading-tight mb-10"
-          style={{ fontFamily: "var(--font-heading)", color: "#0a0a0a" }}
+          style={{ fontFamily: "var(--font-heading)", color: "#000000" }}
         >
           Projects
         </h1>

@@ -1,11 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bone: #f5f3ee;
-  --color-ink: #0a0a0a;
-  --color-rust: #b85c38;
-  --color-slate: #6b6b6b;
-  --color-bone-soft: #ebe7df;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-grey: #666666;
+  --color-grey-soft: #e5e5e5;
 
   --font-heading: var(--font-playfair), Georgia, serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
@@ -17,8 +16,8 @@ html {
 
 body {
   font-family: var(--font-body);
-  background-color: #f5f3ee;
-  color: #0a0a0a;
+  background-color: #ffffff;
+  color: #000000;
   overflow-x: hidden;
 }
 
@@ -27,6 +26,59 @@ body {
 }
 
 ::selection {
-  background-color: #b85c38;
-  color: #f5f3ee;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* ───────────────────── Jagged "torn-edge" utilities ─────────────────────
+   The SVG filter (#torn-edge) is defined once in app/layout.tsx.
+   Filter is applied to a ::before pseudo-element so the content (text)
+   stays crisp while only the frame edge gets displaced.
+───────────────────────────────────────────────────────────────────────── */
+
+.torn-box {
+  position: relative;
+}
+
+.torn-box > * {
+  position: relative;
+  z-index: 1;
+}
+
+.torn-box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: #ffffff;
+  border: 1.5px solid #000000;
+  filter: url(#torn-edge);
+  z-index: 0;
+}
+
+/* Inverted variant: black fill, white interior text */
+.torn-box--dark::before {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+/* Hover state — invert torn-box on hover */
+.torn-box-hover:hover::before {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.torn-box-hover {
+  transition: color 0.25s ease;
+}
+
+.torn-box-hover:hover,
+.torn-box-hover:hover * {
+  color: #ffffff !important;
+}
+
+/* Standalone jagged line — used as a horizontal divider */
+.torn-line {
+  height: 1.5px;
+  background: #000000;
+  filter: url(#torn-edge);
 }

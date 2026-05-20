@@ -21,58 +21,21 @@ export default function HeroSection() {
   const [mouse, setMouse] = useState<{ x: number; y: number } | null>(null);
 
   const handleZoneClick = useCallback(
-    (zone: Zone) => {
-      router.push(ZONE_ROUTES[zone]);
-    },
+    (zone: Zone) => router.push(ZONE_ROUTES[zone]),
     [router]
   );
 
-  const handleHoverChange = useCallback(
-    (zone: Zone | null, m?: { x: number; y: number }) => {
-      setHoverZone(zone);
-      if (m) setMouse(m);
-      else setMouse(null);
-    },
-    []
-  );
+  const handleHoverChange = useCallback((zone: Zone | null, m?: { x: number; y: number }) => {
+    setHoverZone(zone);
+    setMouse(m ?? null);
+  }, []);
 
   return (
     <section
-      className="relative w-full flex flex-col"
-      style={{ backgroundColor: "#f5f3ee", height: "calc(100vh - 64px)" }}
+      className="relative w-full"
+      style={{ backgroundColor: "#ffffff", height: "100vh", width: "100vw" }}
     >
-      {/* Title row */}
-      <div className="text-center pt-6 pb-2 px-6 flex-shrink-0">
-        <h1
-          className="text-5xl md:text-7xl font-bold leading-none tracking-tight"
-          style={{ fontFamily: "var(--font-heading)", color: "#0a0a0a" }}
-        >
-          Alexander Vogel
-        </h1>
-        <p
-          className="mt-2 text-xs md:text-sm tracking-[0.3em] uppercase"
-          style={{ fontFamily: "var(--font-body)", color: "#b85c38" }}
-        >
-          Literature · Athletics · Entertainment
-        </p>
-      </div>
-
-      {/* 3D canvas — flex-1 fills remaining height */}
-      <div className="flex-1 relative">
-        <HumanoidScene onZoneClick={handleZoneClick} onHoverChange={handleHoverChange} />
-      </div>
-
-      {/* Bottom hint */}
-      <div className="text-center pb-5 pt-2 flex-shrink-0">
-        <p
-          className="text-[10px] md:text-xs tracking-[0.4em] uppercase"
-          style={{ fontFamily: "var(--font-body)", color: "#6b6b6b" }}
-        >
-          Hover the figure · Click to enter
-        </p>
-      </div>
-
-      {/* Tooltip overlay */}
+      <HumanoidScene onZoneClick={handleZoneClick} onHoverChange={handleHoverChange} />
       <HoverTooltip zone={hoverZone} mouse={mouse} />
     </section>
   );

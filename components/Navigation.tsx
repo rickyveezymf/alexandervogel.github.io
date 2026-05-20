@@ -15,23 +15,24 @@ export default function Navigation() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Landing page is uninterrupted — figure only.
+  if (pathname === "/") return null;
+
   return (
     <nav
       className="fixed top-0 left-0 right-0 z-50"
       style={{
-        backgroundColor: "rgba(245, 243, 238, 0.92)",
-        backdropFilter: "blur(10px)",
-        borderBottom: "1px solid rgba(10, 10, 10, 0.08)",
+        backgroundColor: "#ffffff",
+        borderBottom: "1.5px solid #000000",
       }}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
         <Link
           href="/"
           className="text-xl tracking-wider"
-          style={{ fontFamily: "var(--font-heading)", color: "#0a0a0a" }}
+          style={{ fontFamily: "var(--font-heading)", color: "#000000" }}
         >
-          AV<span style={{ color: "#b85c38" }}>.</span>
+          AV.
         </Link>
 
         {/* Desktop links */}
@@ -42,11 +43,12 @@ export default function Navigation() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-xs tracking-[0.25em] uppercase relative pb-1 transition-colors duration-200"
+                  className="text-xs tracking-[0.25em] uppercase pb-1 transition-all duration-150"
                   style={{
                     fontFamily: "var(--font-body)",
-                    color: active ? "#b85c38" : "#0a0a0a",
-                    borderBottom: active ? "1px solid #b85c38" : "1px solid transparent",
+                    color: "#000000",
+                    fontWeight: active ? 700 : 400,
+                    borderBottom: active ? "1.5px solid #000000" : "1.5px solid transparent",
                   }}
                 >
                   {link.label}
@@ -66,18 +68,18 @@ export default function Navigation() {
           <span
             className="block w-6 h-0.5 transition-all duration-300"
             style={{
-              backgroundColor: "#0a0a0a",
+              backgroundColor: "#000000",
               transform: menuOpen ? "rotate(45deg) translate(4px, 4px)" : undefined,
             }}
           />
           <span
             className="block w-6 h-0.5 transition-all duration-300"
-            style={{ backgroundColor: "#0a0a0a", opacity: menuOpen ? 0 : 1 }}
+            style={{ backgroundColor: "#000000", opacity: menuOpen ? 0 : 1 }}
           />
           <span
             className="block w-6 h-0.5 transition-all duration-300"
             style={{
-              backgroundColor: "#0a0a0a",
+              backgroundColor: "#000000",
               transform: menuOpen ? "rotate(-45deg) translate(4px, -4px)" : undefined,
             }}
           />
@@ -86,8 +88,11 @@ export default function Navigation() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden px-6 pb-6" style={{ backgroundColor: "#f5f3ee" }}>
-          <ul className="flex flex-col gap-4">
+        <div
+          className="md:hidden px-6 pb-6"
+          style={{ backgroundColor: "#ffffff", borderTop: "1px solid #000000" }}
+        >
+          <ul className="flex flex-col gap-4 pt-4">
             {navLinks.map((link) => {
               const active = pathname === link.href;
               return (
@@ -98,7 +103,8 @@ export default function Navigation() {
                     className="text-xs tracking-[0.25em] uppercase block"
                     style={{
                       fontFamily: "var(--font-body)",
-                      color: active ? "#b85c38" : "#0a0a0a",
+                      color: "#000000",
+                      fontWeight: active ? 700 : 400,
                     }}
                   >
                     {link.label}

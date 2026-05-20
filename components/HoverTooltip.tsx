@@ -19,27 +19,17 @@ export default function HoverTooltip({ zone, mouse }: HoverTooltipProps) {
 
   return (
     <div
-      className="pointer-events-none fixed z-40 transition-opacity duration-150"
-      style={{
-        left: mouse.x + 18,
-        top: mouse.y + 18,
-        opacity: 1,
-      }}
+      className="pointer-events-none fixed z-40"
+      style={{ left: mouse.x + 18, top: mouse.y + 18 }}
     >
-      <div
-        className="flex items-center gap-2 px-4 py-2 rounded-sm shadow-lg backdrop-blur-sm"
-        style={{
-          backgroundColor: "rgba(10, 10, 10, 0.92)",
-          border: "1px solid #b85c38",
-        }}
-      >
+      <div className="torn-box px-5 py-2.5">
         <span
-          className="text-xs tracking-widest uppercase"
-          style={{ color: "#f5f3ee", fontFamily: "var(--font-body)" }}
+          className="text-[11px] tracking-[0.3em] uppercase font-medium inline-flex items-center gap-2"
+          style={{ color: "#000000", fontFamily: "var(--font-body)" }}
         >
           {ZONE_LABELS[zone]}
+          <span aria-hidden>→</span>
         </span>
-        <span style={{ color: "#b85c38" }}>→</span>
       </div>
     </div>
   );

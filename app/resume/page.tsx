@@ -1,11 +1,11 @@
-type Item = { primary: string; secondary: string; accent?: boolean };
+type Item = { primary: string; secondary: string; bold?: boolean };
 type Section = { title: string; items: Item[] };
 
 const sections: Section[] = [
   {
     title: "Education",
     items: [
-      { primary: "The Browning School", secondary: "GPA 3.94 · High Honors", accent: true },
+      { primary: "The Browning School", secondary: "GPA 3.94 · High Honors", bold: true },
     ],
   },
   {
@@ -29,18 +29,21 @@ const sections: Section[] = [
 
 export default function ResumePage() {
   return (
-    <main className="min-h-[calc(100vh-64px)] px-6 py-12" style={{ backgroundColor: "#f5f3ee" }}>
+    <main
+      className="min-h-screen px-6 pt-28 pb-16"
+      style={{ backgroundColor: "#ffffff" }}
+    >
       <div className="max-w-6xl mx-auto">
         <p
           className="text-[10px] tracking-[0.4em] uppercase mb-2"
-          style={{ color: "#b85c38", fontFamily: "var(--font-body)" }}
+          style={{ color: "#666666", fontFamily: "var(--font-body)" }}
         >
           02 / The Record
         </p>
 
         <h1
           className="text-5xl md:text-7xl font-bold leading-tight mb-10"
-          style={{ fontFamily: "var(--font-heading)", color: "#0a0a0a" }}
+          style={{ fontFamily: "var(--font-heading)", color: "#000000" }}
         >
           Résumé
         </h1>
@@ -49,22 +52,23 @@ export default function ResumePage() {
           {sections.map((section) => (
             <div key={section.title}>
               <h2
-                className="text-xs tracking-[0.3em] uppercase mb-5 pb-3"
+                className="text-xs tracking-[0.3em] uppercase mb-3 pb-3"
                 style={{
-                  color: "#b85c38",
+                  color: "#000000",
                   fontFamily: "var(--font-body)",
-                  borderBottom: "1px solid rgba(10,10,10,0.15)",
+                  fontWeight: 700,
                 }}
               >
                 {section.title}
               </h2>
+              <div className="torn-line w-full mb-5" />
 
               <ul className="space-y-5">
                 {section.items.map((item) => (
                   <li key={item.primary}>
                     <p
                       className="font-medium text-base"
-                      style={{ fontFamily: "var(--font-body)", color: "#0a0a0a" }}
+                      style={{ fontFamily: "var(--font-body)", color: "#000000" }}
                     >
                       {item.primary}
                     </p>
@@ -72,7 +76,8 @@ export default function ResumePage() {
                       className="text-sm mt-1"
                       style={{
                         fontFamily: "var(--font-body)",
-                        color: item.accent ? "#b85c38" : "#6b6b6b",
+                        color: item.bold ? "#000000" : "#666666",
+                        fontWeight: item.bold ? 700 : 400,
                       }}
                     >
                       {item.secondary}

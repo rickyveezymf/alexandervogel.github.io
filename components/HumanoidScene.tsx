@@ -11,100 +11,110 @@ interface HumanoidSceneProps {
   onHoverChange: (zone: Zone | null, mouse?: { x: number; y: number }) => void;
 }
 
-const INK = 0x0a0a0a;
-const INK_SOFT = 0x1f1f1f;
-const RUST = 0xb85c38;
-const BONE = 0xf5f3ee;
+const BLACK = 0x000000;
+const GREY = 0x666666;
+const WHITE = 0xffffff;
 
-type ZoneMeshes = Record<Zone, THREE.Mesh[]>;
+/**
+ * Future: when a body scan is uploaded, replace the meshes inside each named
+ * group (headGroup / torsoGroup / armsGroup / legsGroup) with the scan
+ * geometry. Apply a shared MeshStandardMaterial via applyZoneMaterial(zone, mat)
+ * to project-map textures onto the scan.
+ */
 
-function buildHumanoid(): { group: THREE.Group; zoneMeshes: ZoneMeshes } {
-  const group = new THREE.Group();
-  const zoneMeshes: ZoneMeshes = { head: [], torso: [], arms: [], legs: [] };
+type ZoneGroups = Record<Zone, THREE.Group>;
 
-  const skinMat = () => new THREE.MeshStandardMaterial({ color: INK_SOFT, roughness: 0.55, metalness: 0.1 });
-  const darkMat = () => new THREE.MeshStandardMaterial({ color: INK, roughness: 0.65, metalness: 0.1 });
-  const accentMat = () => new THREE.MeshStandardMaterial({ color: RUST, roughness: 0.45, metalness: 0.2 });
+function buildHumanoid(): { root: THREE.Group; zones: ZoneGroups } {
+  const root = new THREE.Group();
 
-  const add = (zone: Zone, mesh: THREE.Mesh) => {
+  const headGroup = new THREE.Group();
+  headGroup.name = "headGroup";
+  const torsoGroup = new THREE.Group();
+  torsoGroup.name = "torsoGroup";
+  const armsGroup = new THREE.Group();
+  armsGroup.name = "armsGroup";
+  const legsGroup = new THREE.Group();
+  legsGroup.name = "legsGroup";
+
+  root.add(headGroup, torsoGroup, armsGroup, legsGroup);
+
+  const black = () => new THREE.MeshBasicMaterial({ color: BLACK });
+
+  const addTo = (group: THREE.Group, mesh: THREE.Mesh) => {
     group.add(mesh);
-    zoneMeshes[zone].push(mesh);
   };
 
   // Head
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 24), skinMat());
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 24), black());
   head.position.set(0, 2.1, 0);
-  add("head", head);
+  addTo(headGroup, head);
 
-  // Neck (head zone)
-  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.1, 0.2, 16), skinMat());
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.1, 0.2, 16), black());
   neck.position.set(0, 1.78, 0);
-  add("head", neck);
+  addTo(headGroup, neck);
 
   // Torso
-  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.0, 0.38), darkMat());
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.0, 0.38), black());
   torso.position.set(0, 1.18, 0);
-  add("torso", torso);
+  addTo(torsoGroup, torso);
 
-  // Belt (rust accent, torso zone)
-  const belt = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.1, 0.4), accentMat());
+  const belt = new THREE.Mesh(new THREE.BoxGeometry(0.74, 0.1, 0.4), black());
   belt.position.set(0, 0.67, 0);
-  add("torso", belt);
+  addTo(torsoGroup, belt);
 
-  // Hips (torso zone)
-  const hips = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.28, 0.36), darkMat());
+  const hips = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.28, 0.36), black());
   hips.position.set(0, 0.5, 0);
-  add("torso", hips);
+  addTo(torsoGroup, hips);
 
   // Arms
   const buildArm = (side: 1 | -1) => {
-    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), skinMat());
+    const shoulder = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), black());
     shoulder.position.set(side * 0.46, 1.58, 0);
-    add("arms", shoulder);
+    addTo(armsGroup, shoulder);
 
-    const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.52, 16), darkMat());
+    const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.52, 16), black());
     upperArm.position.set(side * 0.56, 1.3, 0);
     upperArm.rotation.z = side * 0.18;
-    add("arms", upperArm);
+    addTo(armsGroup, upperArm);
 
-    const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), skinMat());
+    const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), black());
     elbow.position.set(side * 0.64, 1.04, 0);
-    add("arms", elbow);
+    addTo(armsGroup, elbow);
 
-    const lowerArm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.48, 16), skinMat());
+    const lowerArm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.48, 16), black());
     lowerArm.position.set(side * 0.7, 0.78, 0);
     lowerArm.rotation.z = side * 0.12;
-    add("arms", lowerArm);
+    addTo(armsGroup, lowerArm);
 
-    const hand = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 0.09), skinMat());
+    const hand = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.18, 0.09), black());
     hand.position.set(side * 0.76, 0.53, 0);
-    add("arms", hand);
+    addTo(armsGroup, hand);
   };
   buildArm(1);
   buildArm(-1);
 
   // Legs
   const buildLeg = (side: 1 | -1) => {
-    const upperLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.12, 0.58, 16), darkMat());
+    const upperLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.12, 0.58, 16), black());
     upperLeg.position.set(side * 0.2, 0.06, 0);
-    add("legs", upperLeg);
+    addTo(legsGroup, upperLeg);
 
-    const knee = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), skinMat());
+    const knee = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), black());
     knee.position.set(side * 0.2, -0.26, 0);
-    add("legs", knee);
+    addTo(legsGroup, knee);
 
-    const lowerLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.56, 16), darkMat());
+    const lowerLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.56, 16), black());
     lowerLeg.position.set(side * 0.2, -0.56, 0);
-    add("legs", lowerLeg);
+    addTo(legsGroup, lowerLeg);
 
-    const foot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.1, 0.3), accentMat());
+    const foot = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.1, 0.3), black());
     foot.position.set(side * 0.2, -0.87, 0.06);
-    add("legs", foot);
+    addTo(legsGroup, foot);
   };
   buildLeg(1);
   buildLeg(-1);
 
-  return { group, zoneMeshes };
+  return { root, zones: { head: headGroup, torso: torsoGroup, arms: armsGroup, legs: legsGroup } };
 }
 
 export default function HumanoidScene({ onZoneClick, onHoverChange }: HumanoidSceneProps) {
@@ -121,54 +131,46 @@ export default function HumanoidScene({ onZoneClick, onHoverChange }: HumanoidSc
     const container = containerRef.current;
     if (!container) return;
 
-    // Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(BONE);
+    scene.background = new THREE.Color(WHITE);
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(
-      40,
-      container.clientWidth / container.clientHeight,
-      0.1,
-      100
-    );
+    const camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 100);
     camera.position.set(0, 1.2, 6);
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
 
-    // Lights — softer ambient, ink-friendly
-    const ambient = new THREE.AmbientLight(0xffffff, 0.75);
-    scene.add(ambient);
+    // MeshBasicMaterial ignores lights — no lights needed for flat silhouette.
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
-    keyLight.position.set(3, 5, 4);
-    scene.add(keyLight);
+    const { root, zones } = buildHumanoid();
+    root.position.y = -0.6;
+    scene.add(root);
 
-    const rimLight = new THREE.PointLight(RUST, 0.6, 14);
-    rimLight.position.set(-3, 2, -2);
-    scene.add(rimLight);
-
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.4);
-    fillLight.position.set(-4, 2, 3);
-    scene.add(fillLight);
-
-    // Humanoid
-    const { group, zoneMeshes } = buildHumanoid();
-    group.position.y = -0.6;
-    scene.add(group);
-
+    // Build mesh→zone map for raycasting
     const allMeshes: THREE.Mesh[] = [];
     const meshToZone = new Map<THREE.Mesh, Zone>();
-    (Object.keys(zoneMeshes) as Zone[]).forEach((zone) => {
-      zoneMeshes[zone].forEach((m) => {
-        allMeshes.push(m);
-        meshToZone.set(m, zone);
+    (Object.keys(zones) as Zone[]).forEach((zone) => {
+      zones[zone].traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          allMeshes.push(obj);
+          meshToZone.set(obj, zone);
+        }
       });
     });
+
+    const setZoneColor = (zone: Zone, hex: number) => {
+      zones[zone].traverse((obj) => {
+        if (obj instanceof THREE.Mesh) {
+          (obj.material as THREE.MeshBasicMaterial).color.setHex(hex);
+        }
+      });
+    };
+
+    const clearAllZones = () => {
+      (Object.keys(zones) as Zone[]).forEach((z) => setZoneColor(z, BLACK));
+    };
 
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -180,24 +182,12 @@ export default function HumanoidScene({ onZoneClick, onHoverChange }: HumanoidSc
     controls.target.set(0, 0.5, 0);
     controls.update();
 
-    // Hover + click state
+    // Hover + click
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let hoveredZone: Zone | null = null;
     let isDragging = false;
     let mouseDownPos = { x: 0, y: 0 };
-
-    const setZoneEmissive = (zone: Zone, color: number, intensity: number) => {
-      zoneMeshes[zone].forEach((mesh) => {
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-        mat.emissive.setHex(color);
-        mat.emissiveIntensity = intensity;
-      });
-    };
-
-    const clearAllEmissive = () => {
-      (Object.keys(zoneMeshes) as Zone[]).forEach((z) => setZoneEmissive(z, 0x000000, 0));
-    };
 
     const updateRaycast = (clientX: number, clientY: number): Zone | null => {
       const rect = renderer.domElement.getBoundingClientRect();
@@ -215,15 +205,14 @@ export default function HumanoidScene({ onZoneClick, onHoverChange }: HumanoidSc
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      // drag detection
       const dx = e.clientX - mouseDownPos.x;
       const dy = e.clientY - mouseDownPos.y;
       if (e.buttons > 0 && Math.sqrt(dx * dx + dy * dy) > 4) isDragging = true;
 
       const zone = updateRaycast(e.clientX, e.clientY);
       if (zone !== hoveredZone) {
-        if (hoveredZone) setZoneEmissive(hoveredZone, 0x000000, 0);
-        if (zone) setZoneEmissive(zone, RUST, 0.6);
+        if (hoveredZone) setZoneColor(hoveredZone, BLACK);
+        if (zone) setZoneColor(zone, GREY);
         hoveredZone = zone;
       }
       renderer.domElement.style.cursor = zone ? "pointer" : "grab";
@@ -231,7 +220,7 @@ export default function HumanoidScene({ onZoneClick, onHoverChange }: HumanoidSc
     };
 
     const onMouseLeave = () => {
-      clearAllEmissive();
+      clearAllZones();
       hoveredZone = null;
       onHoverChangeRef.current(null);
       renderer.domElement.style.cursor = "grab";
@@ -258,10 +247,11 @@ export default function HumanoidScene({ onZoneClick, onHoverChange }: HumanoidSc
     });
     observer.observe(container);
 
-    // Animation loop
+    // Idle rotation
     let animId: number;
     const animate = () => {
       animId = requestAnimationFrame(animate);
+      if (!hoveredZone) root.rotation.y += 0.0015;
       controls.update();
       renderer.render(scene, camera);
     };
@@ -274,7 +264,6 @@ export default function HumanoidScene({ onZoneClick, onHoverChange }: HumanoidSc
       renderer.domElement.removeEventListener("mousemove", onMouseMove);
       renderer.domElement.removeEventListener("mouseleave", onMouseLeave);
       renderer.domElement.removeEventListener("mouseup", onMouseUp);
-      // Dispose geometries + materials
       allMeshes.forEach((m) => {
         m.geometry.dispose();
         (m.material as THREE.Material).dispose();
